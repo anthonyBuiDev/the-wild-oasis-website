@@ -1,12 +1,14 @@
 import ReservationCard from "@/components/ReservationCard";
+import { getBookings } from "@/lib/data-service";
+import { BookingTypes } from "@/types";
 
 export const metadata = {
   title: "Reservations",
 };
 
-export default function Page() {
+export default async function Page() {
   // CHANGE
-  const bookings = [];
+  const bookings = await getBookings(1);
 
   return (
     <div>
@@ -17,14 +19,20 @@ export default function Page() {
       {bookings.length === 0 ? (
         <p className="text-lg">
           You have no reservations yet. Check out our{" "}
-          <a className="underline text-accent-500" href="/cabins">
+          <a
+            className="underline text-accent-500"
+            href="/cabins"
+          >
             luxury cabins &rarr;
           </a>
         </p>
       ) : (
         <ul className="space-y-6">
-          {bookings.map((booking) => (
-            <ReservationCard booking={booking} key={booking.id} />
+          {bookings.map((booking: any) => (
+            <ReservationCard
+              booking={booking}
+              key={booking.id}
+            />
           ))}
         </ul>
       )}
