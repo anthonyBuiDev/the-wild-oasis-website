@@ -1,9 +1,8 @@
-import NextAuth, { type DefaultSession } from "next-auth";
-
-
-
+import NextAuth, { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
 import { createGuest, getGuest } from "./data-service";
+
+
 
 const authConfig = {
   providers: [
@@ -13,15 +12,16 @@ const authConfig = {
     }),
   ],
   callbacks: {
-    authorized({ auth, request }: { auth: any, request: any }) {
+    authorized({ auth }) {
       return !!auth?.user;
     },
-    async signIn({ user }: { user: any }) {
+
+    async signIn({ user }) {
       try {
         const existingGuest = await getGuest(user.email!);
 
         if (!existingGuest)
-          await createGuest({ email: user.email, fullName: user.name });
+          await createGuest({ email: user.email!, fullName: user.name! });
 
         return true;
       } catch {
@@ -29,16 +29,16 @@ const authConfig = {
       }
     },
 
-    async session({ session }: { session: any }) {
+    async session({ session }) {
       const guest = await getGuest(session.user.email);
-      session.user.guestId = guest?.id;
+      session.user.guestId = guest?.id || 0;
       return session;
     },
   },
   pages: {
     signIn: "/login",
   },
-};
+} satisfies NextAuthConfig;
 
 export const {
   auth,
